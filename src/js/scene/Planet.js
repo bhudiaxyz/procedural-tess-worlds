@@ -12,7 +12,6 @@ import Glow from './Glow'
 import AtmosphereRing from './AtmosphereRing'
 
 const BASE_WATER_COLOR = new THREE.Color(0.0, 0.4, 0.9);
-const NUM_MAP_PLANE_ON_SPHERE = 6
 const PLANET_RESOLUTION = 1024
 
 export default class Planet extends THREE.Object3D {
@@ -47,8 +46,8 @@ export default class Planet extends THREE.Object3D {
     };
     this.params.normalScaleV2 = new THREE.Vector2(this.params.normalScale, this.params.normalScale);
 
-    this.createInnerPlanet();
-    this.createOuterPlanet();
+    this.createInnerSurface();
+    this.createUpperLayers();
 
     this.createControls();
   }
@@ -70,7 +69,7 @@ export default class Planet extends THREE.Object3D {
     return this.params.rotate;
   }
 
-  createInnerPlanet() {
+  createInnerSurface() {
     this.biome = new BiomeTexture();
 
     this.heightMap = new NoiseEnvMap();
@@ -89,7 +88,7 @@ export default class Planet extends THREE.Object3D {
     this.roughnessMaps = this.roughnessMap.maps;
 
     this.materials = [];
-    for (let i = 0; i < NUM_MAP_PLANE_ON_SPHERE; ++i) {
+    for (let i = 0; i < 6; ++i) {
       this.materials.push(new THREE.MeshStandardMaterial({
         color: new THREE.Color(0xffffff),
         wireframe: this.params.wireframe,
@@ -101,7 +100,7 @@ export default class Planet extends THREE.Object3D {
       }));
     }
 
-    this.geometry = new THREE.BoxGeometry(1, 1, 1, 128, 128, 128);
+    this.geometry = new THREE.BoxGeometry(1, 1, 1, 64, 64, 64);
     for (var i in this.geometry.vertices) {
       this.geometry.vertices[i].normalize().multiplyScalar(this.radius);
     }
@@ -111,7 +110,7 @@ export default class Planet extends THREE.Object3D {
   }
 
 
-  createOuterPlanet() {
+  createUpperLayers() {
     this.clouds = new Clouds();
     this.add(this.clouds);
 
@@ -149,7 +148,7 @@ export default class Planet extends THREE.Object3D {
 
     const planetFields = ["roughness", "metalness", "bumpScale", "displacementScale"];
     for (let i = 0; i < planetFields.length; ++i) {
-      planetFolder.add(this.params, planetFields[i], 0.0, 1.0).listen().onChange(value => {
+      planetFolder.add(this.params, planetFields[i], -1.0, 1.0).listen().onChange(value => {
         this.updateMaterial();
       });
     }
@@ -278,7 +277,7 @@ export default class Planet extends THREE.Object3D {
   updateMaterial() {
     this.params.normalScaleV2.set(this.params.normalScale, this.params.normalScale);
 
-    for (let i = 0; i < NUM_MAP_PLANE_ON_SPHERE; ++i) {
+    for (let i = 0; i < 6; ++i) {
       let material = this.materials[i];
       material.wireframe = this.params.wireframe;
       material.roughness = this.params.roughness;

@@ -13,6 +13,7 @@ import Nebula from "../scene/Nebula";
 import Sun from "../scene/Sun";
 import PlanetEarth from '../scene/PlanetEarth'
 import SimplePlanet from "../scene/SimplePlanet";
+import SimpleTessPlanet from "../scene/SimpleTessPlanet";
 
 const N = 6;
 const TWO_N = Math.pow(2, N); // detail of the spheres
@@ -47,9 +48,10 @@ export default class Main extends AbstractApplication {
     this.sun = new Sun();
     this.scene.add(this.sun);
 
-    this.planet = new Planet();
-    // this.planet = new PlanetEarth(this.random, EARTH_RADIUS, N, TWO_N, TWO_N);
-    // this.planet = new SimplePlanet(this.random, EARTH_RADIUS, N, TWO_N, TWO_N);
+    // this.planet = new Planet();
+    this.planet = new PlanetEarth(this.random, this.noise, EARTH_RADIUS, N, TWO_N, TWO_N);
+    // this.planet = new SimplePlanet(this.random, this.noise, EARTH_RADIUS, N, TWO_N, TWO_N);
+    // this.planet = new SimpleTessPlanet(this.random, this.noise, EARTH_RADIUS, N, TWO_N, TWO_N);
     this.scene.add(this.planet);
 
     this.setupControlsUI();

@@ -6,17 +6,18 @@ import cloudsFragShader from '!raw-loader!glslify-loader!../shaders/clouds.frag'
 import standardVertShader from '!raw-loader!glslify-loader!../shaders/standard.vert';
 import waterFragShader from '!raw-loader!glslify-loader!../shaders/water.frag';
 
-const imgGrass = require('../../assets/textures/terrain/grass3.jpg');
+const imgGrass = require('../../assets/textures/terrain/grass1.jpg');
 const imgMoon = require('../../assets/textures/planets/moon.png');
-const imgSand = require('../../assets/textures/terrain/sand2.jpg');
+const imgSand = require('../../assets/textures/terrain/sand1.jpg');
 const imgSnow = require('../../assets/textures/terrain/snow2.jpg');
 const imgStone = require('../../assets/textures/terrain/stone2.jpg');
-const imgWater = require('../../assets/textures/terrain/water1.jpg');
-const imgWaterNormals = require('../../assets/textures/terrain/water_normals1.jpg');
+const imgWater = require('../../assets/textures/terrain/ocean1.jpg');
+const imgWaterNormals = require('../../assets/textures/terrain/water_normals2.jpg');
 
 export default class PlanetEarth extends THREE.Object3D {
   constructor(
     random,
+    noise,
     radius = 1000.0,
     detail = 6,
     widthSegments = 64,
@@ -25,6 +26,7 @@ export default class PlanetEarth extends THREE.Object3D {
     super();
 
     this.random = random;
+    this.noise = noise;
 
     this.params = {
       // General
@@ -35,8 +37,8 @@ export default class PlanetEarth extends THREE.Object3D {
         visible: true,
         radius: radius,
         speed: 0.000005,
-        roughness: 0.01137,
-        lacunarity: 0.00125,
+        roughness: 0.087,
+        lacunarity: 0.0015,
         rotation: new THREE.Vector3(0.0, 0.003, 0.000)
       },
 
@@ -51,7 +53,7 @@ export default class PlanetEarth extends THREE.Object3D {
       // Clouds
       clouds: {
         visible: true,
-        radius: radius * 1.035,
+        radius: radius * 1.075,
         speed: 0.00002140,
         rangeFactor: 0.29,
         smoothness: 2.6,
@@ -61,7 +63,7 @@ export default class PlanetEarth extends THREE.Object3D {
       // Atmosphere
       atmosphere: {
         visible: true,
-        radius: radius * 1.025,
+        radius: radius * 1.085,
         speed: 0.00002140
       },
 
@@ -71,8 +73,8 @@ export default class PlanetEarth extends THREE.Object3D {
         radius: radius * 0.27,
         speed: 0.00015,
         positionX: radius * 5.36,
-        roughness: 0.031,
-        lacunarity: 0.076
+        roughness: 0.083,
+        lacunarity: 0.083
       },
 
       // Lighting
@@ -247,7 +249,7 @@ export default class PlanetEarth extends THREE.Object3D {
     f.add(this.params.earth, 'roughness', 0.0, 0.1).onChange(value => {
       this.updateMaterial();
     });
-    f.add(this.params.earth, 'lacunarity', -1.0, 1.0).onChange(value => {
+    f.add(this.params.earth, 'lacunarity', 0.0, 0.01).onChange(value => {
       this.updateMaterial();
     });
     f.add(this.params.earth.rotation, 'x').name('Rotation X').min(-0.05).max(0.05);
@@ -287,10 +289,10 @@ export default class PlanetEarth extends THREE.Object3D {
       this.moonMesh.visible = value;
     });
     f.add(this.params.moon, 'speed', -0.05, 0.05);
-    f.add(this.params.moon, 'roughness', 0.0, 2.0).onChange(value => {
+    f.add(this.params.moon, 'roughness', 0.0, 0.1).onChange(value => {
       this.updateMaterial();
     });
-    f.add(this.params.moon, 'lacunarity', 0.0, 2.0).onChange(value => {
+    f.add(this.params.moon, 'lacunarity', 0.0, 0.01).onChange(value => {
       this.updateMaterial();
     });
     f.close();

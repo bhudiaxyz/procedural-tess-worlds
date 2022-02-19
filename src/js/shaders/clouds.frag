@@ -1,7 +1,5 @@
 precision highp float;
 
-#pragma glslify: PI = require('glsl-pi');
-
 uniform float time;
 uniform vec4 lightColor;
 uniform float lightIntensity;
@@ -16,6 +14,7 @@ varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec3 lightDirection;
 
+const float PI = 3.14159265358979323846264;
 
 int mod(int x, int m) {
     return int(mod(float(x), float(m)));
@@ -42,17 +41,20 @@ float interpolation(float a, float b, float x) {
 float tricosine(vec3 coordFloat) {
     vec3 coord0 = vec3(floor(coordFloat.x), floor(coordFloat.y), floor(coordFloat.z));
     vec3 coord1 = vec3(coord0.x+1.0, coord0.y+1.0, coord0.z+1.0);
+
     float xd = (coordFloat.x - coord0.x)/max(1.0, (coord1.x - coord0.x));
     float yd = (coordFloat.y - coord0.y)/max(1.0, (coord1.y - coord0.y));
     float zd = (coordFloat.z - coord0.z)/max(1.0, (coord1.z - coord0.z));
+
     float c00 = interpolation(random4(coord0.x, coord0.y, coord0.z), random4(coord1.x, coord0.y, coord0.z), xd);
     float c10 = interpolation(random4(coord0.x, coord1.y, coord0.z), random4(coord1.x, coord1.y, coord0.z), xd);
+    float c0 = interpolation(c00, c10, yd);
+
     float c01 = interpolation(random4(coord0.x, coord0.y, coord1.z), random4(coord1.x, coord0.y, coord1.z), xd);
     float c11 = interpolation(random4(coord0.x, coord1.y, coord1.z), random4(coord1.x, coord1.y, coord1.z), xd);
-    float c0 = interpolation(c00, c10, yd);
     float c1 = interpolation(c01, c11, yd);
-    float c = interpolation(c0, c1, zd);
 
+    float c = interpolation(c0, c1, zd);
     return c;
 }
 
@@ -67,6 +69,7 @@ float helper(float x, float y, float z, float resolution, vec3 offset) {
 
     vec3 coordFloat = vec3(x, y, z);
     float interpolated = tricosine(coordFloat);
+//    float interpolated = (tricosine(coordFloat) * 0.851) + (nearestNeighbour(coordFloat + offset) * 0.11234);
     //float interpolated = nearestNeighbour(coordFloat);
     return interpolated;
 }
@@ -88,18 +91,18 @@ vec3 scalarField(float x, float y, float z, float smoothness) {
     return vec3(c, c, c);
 }
 
-const float threshold = 0.75;
+const float threshold = 0.45;
 
 void main() {
     vec3 np = normalize(vPosition);
     vec3 grad = scalarField(np.x, np.y, np.z, smoothness);
-    vec3 col = vec3(baseColor) +  (grad-0.5)/rangeFactor;
+    vec3 col = vec3(baseColor) +  (grad-0.65)/rangeFactor;
     vec4 color = vec4(col, 1.0);
 
     float a = max(0.1, dot(vNormal, lightDirection))*lightIntensity/2.0;
 
     vec4 finalColor = lightColor * color * a;
-    float densityFactor = 1.2;// this value should be > 1.0
+    float densityFactor = 1.061213;// this value should be > 1.0
     float alpha = (color.r-threshold)/(1.0-threshold)*densityFactor;
     gl_FragColor = vec4(finalColor.rgb, alpha);
 }
