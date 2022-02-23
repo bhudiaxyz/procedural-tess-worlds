@@ -74,7 +74,7 @@ export default class PlanetEarth extends THREE.Object3D {
         speed: 0.00015,
         positionX: radius * 5.36,
         roughness: 0.083,
-        lacunarity: 0.083
+        lacunarity: 0.005
       },
 
       // Lighting
@@ -114,7 +114,7 @@ export default class PlanetEarth extends THREE.Object3D {
           radius: {type: "f", value: this.params.earth.radius},
           roughness: {type: "f", value: this.params.earth.roughness},
           lacunarity: {type: "f", value: this.params.earth.lacunarity},
-          seed: {type: "f", value: this.random() * 7}
+          seed: {type: "f", value: this.randRange(0, 1000)}
         },
         vertexShader: terrainVertShader,
         fragmentShader: terrainFragShader
@@ -140,7 +140,7 @@ export default class PlanetEarth extends THREE.Object3D {
           radius: {type: "f", value: this.params.ocean.radius},
           roughness: {type: "f", value: this.params.earth.roughness * 2.7},
           lacunarity: {type: "f", value: this.params.earth.lacunarity * 3.14},
-          seed: {type: "f", value: this.random() * 7}
+          seed: {type: "f", value: this.randRange(0, 1000)}
         },
         vertexShader: standardVertShader,
         fragmentShader: waterFragShader
@@ -163,7 +163,7 @@ export default class PlanetEarth extends THREE.Object3D {
           radius: {type: "f", value: this.params.atmosphere.radius},
           roughness: {type: "f", value: this.params.earth.roughness},
           lacunarity: {type: "f", value: this.params.earth.lacunarity},
-          seed: {type: "f", value: this.random() * 7}
+          seed: {type: "f", value: this.randRange(0, 1000)}
         },
         vertexShader: standardVertShader,
         fragmentShader: atmosphereFragShader,
@@ -190,7 +190,7 @@ export default class PlanetEarth extends THREE.Object3D {
           baseColor: {type: "v3", value: new THREE.Vector3(0.65, 0.65, 0.65)},
           rangeFactor: {type: "f", value: this.params.clouds.rangeFactor},
           smoothness: {type: "f", value: this.params.clouds.smoothness},
-          seed: {type: "f", value: this.random() * 7}
+          seed: {type: "f", value: this.randRange(0, 1000)}
         },
         vertexShader: standardVertShader,
         fragmentShader: cloudsFragShader,
@@ -227,7 +227,7 @@ export default class PlanetEarth extends THREE.Object3D {
           radius: {type: "f", value: this.params.moon.radius},
           roughness: {type: "f", value: this.params.moon.roughness},
           lacunarity: {type: "f", value: this.params.moon.lacunarity},
-          seed: {type: "f", value: this.random() * 7}
+          seed: {type: "f", value: this.randRange(0, 1000)}
         },
         vertexShader: terrainVertShader,
         fragmentShader: terrainFragShader
@@ -237,6 +237,12 @@ export default class PlanetEarth extends THREE.Object3D {
     this.moonMesh.rotation.y = -180.0; // so dark-side of moon is facing out from earth point of view
     this.add(this.moonMesh);
     this.earthPivotPoint.add(this.moonMesh); // Moon pivots around (and parented to) the earth.
+  }
+
+  randRange(low, high) {
+    let range = high - low;
+    let n = window.rng() * range;
+    return low + n;
   }
 
   createControls() {
@@ -299,11 +305,18 @@ export default class PlanetEarth extends THREE.Object3D {
   }
 
   randomize() {
-    this.earthMesh.material.uniforms.seed.value = this.random() * 7.0;
-    this.oceanMesh.material.uniforms.seed.value = this.random() * 7.0;
-    this.atmosphereMesh.material.uniforms.seed.value = this.random() * 7.0;
-    this.cloudsMesh.material.uniforms.seed.value = this.random() * 7.0;
-    this.moonMesh.material.uniforms.seed.value = this.random() * 7.0;
+
+    // this.earthMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.oceanMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.atmosphereMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.cloudsMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.moonMesh.material.uniforms.seed.value = this.random() * 7.0;
+    this.earthMesh.material.uniforms.seed.value = this.randRange(0, 1000);
+    this.oceanMesh.material.uniforms.seed.value = this.randRange(0, 1000);
+    this.atmosphereMesh.material.uniforms.seed.value = this.randRange(0, 1000);
+    this.cloudsMesh.material.uniforms.seed.value = this.randRange(0, 1000);
+    this.moonMesh.material.uniforms.seed.value = this.randRange(0, 1000);
+
   }
 
   updateMaterial() {

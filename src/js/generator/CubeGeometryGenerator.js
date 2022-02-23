@@ -136,7 +136,5 @@ export default class CubeGeometryGenerator extends AbstractGenerator {
     }
 
     return geometry;
-
-
   }
 }

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import BiomeTexture from "../tools/BiomeTexture";
 import NebulaTexture from "../tools/NebulaTexture";
 import NormalPlanetGeometryGenerator from "../generator/NormalPlanetGeometryGenerator";
+import NormalTilePlanetGeometryGenerator from "../generator/NormalTilePlanetGeometryGenerator";
 
 const imgGrass = require('../../assets/textures/terrain/grass3.jpg');
 const imgMoon = require('../../assets/textures/planets/moon.png');
@@ -65,7 +66,7 @@ export default class SimpleTessPlanet extends THREE.Object3D {
     this.generateTexture();
 
     // this.geometry = new THREE.IcosahedronBufferGeometry(radius, detail);
-    let planet = new NormalPlanetGeometryGenerator(random, noise, {
+    let planet = new NormalTilePlanetGeometryGenerator(random, noise, {
       lacunarity: this.params.lacunarity,
       persistance: 0.0,
       octaves: this.params.octaves,
@@ -98,16 +99,23 @@ export default class SimpleTessPlanet extends THREE.Object3D {
         radius: {type: "f", value: radius},
         roughness: {type: "f", value: this.params.roughness},
         lacunarity: {type: "f", value: this.params.lacunarity},
-        seed: {type: "f", value: random() * 7}
+        seed: {type: "f", value: this.randRange(0, 1000)}
       },
       vertexShader: terrainVertShader,
       fragmentShader: terrainFragShader
     });
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
+    // this.mesh = new THREE.Mesh(this.geometry);
     this.add(this.mesh);
 
     this.createControls();
+  }
+
+  randRange(low, high) {
+    let range = high - low;
+    let n = window.rng() * range;
+    return low + n;
   }
 
   createControls() {
@@ -149,10 +157,21 @@ export default class SimpleTessPlanet extends THREE.Object3D {
     // this.material.uniforms.texStone.value = this.stoneTexture.texture;
     // this.material.uniforms.texSnow.value = this.snowTexture.texture;
 
+
     this.material.needsUpdate = true;
   }
 
+  randomize() {
+    // this.earthMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.oceanMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.atmosphereMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.cloudsMesh.material.uniforms.seed.value = this.random() * 7.0;
+    // this.moonMesh.material.uniforms.seed.value = this.random() * 7.0;
+    this.material.uniforms.seed.value = this.randRange(0, 1000);
+  }
+
   render() {
+    this.randomize();
     this.generateTexture();
     this.updateMaterial();
   }

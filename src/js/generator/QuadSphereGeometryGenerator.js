@@ -25,6 +25,5 @@ export default class QuadSphereGeometryGenerator extends AbstractGenerator {
     }
 
     return quadsphere;
-
   }
 }
